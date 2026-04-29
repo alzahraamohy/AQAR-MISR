@@ -75,7 +75,7 @@ python app.py
   - File: `models.py`, line 2 — `from datetime import datetime`
   - Used in: `User.__init__()` line 13 and `Property.__init__()` line 65 — `datetime.now().isoformat()` automatically timestamps every new user account and property listing
 
-- [x] **It contains at least one class written by you that has both properties and methods.**
+- [x] **It contains at least one class that has both properties and methods.**
 
   **Class 1: `Property`**
   - File name for the class definition: `models.py`
@@ -125,7 +125,7 @@ python app.py
   - File: `models.py`
   - Line 30: `if prop_id in self.favorites:` with `.remove()` and `.append()` — inside `toggle_favorite()`
 
-- [x] **It lets the user enter a value in a text box at some point. This value is received and processed by your back end Python code.**
+- [x] **It lets the user enter a value in a text box at some point. This value is received and processed back end Python code.**
   - File: `add_property.html` — form with text inputs for title, area, description, and why_choose
   - File: `app.py` lines 332–336 — `request.form.get("title", "")`, `request.form.get("area", "")` etc. read every field submitted by the user and process them to create a new Property object
 

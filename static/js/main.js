@@ -48,7 +48,7 @@ var loadUserFromLocalStorage = function () {
         userFavorites = [];
     }
 
-    var userObject = {
+    let userObject = {
         user_id: userId,
         name: userName,
         email: userEmail,
@@ -57,17 +57,17 @@ var loadUserFromLocalStorage = function () {
     return userObject;
 };
 
-var updateLocalStorageFavorites = function (propId, isNowFavorited) {
+let updateLocalStorageFavorites = function (propId, isNowFavorited) {
     if (typeof Storage === "undefined") {
         return;
     }
 
-    var userFavoritesRaw = localStorage.getItem("aqar_user_favorites");
-    var favoritesList = [];
+    let userFavoritesRaw = localStorage.getItem("aqar_user_favorites");
+    let favoritesList = [];
 
     if (userFavoritesRaw !== null) {
         try {
-            var parsedFavorites = JSON.parse(userFavoritesRaw);
+            let parsedFavorites = JSON.parse(userFavoritesRaw);
             if (Array.isArray(parsedFavorites)) {
                 favoritesList = parsedFavorites;
             }
@@ -77,8 +77,8 @@ var updateLocalStorageFavorites = function (propId, isNowFavorited) {
         }
     }
     
-    var foundIndex = -1;
-    for (var i = 0; i < favoritesList.length; i++) {
+    let foundIndex = -1;
+    for (let i = 0; i < favoritesList.length; i++) {
         if (favoritesList[i] === propId) {
             foundIndex = i;
             break; // Stop searching once found
@@ -99,7 +99,7 @@ var updateLocalStorageFavorites = function (propId, isNowFavorited) {
     localStorage.setItem("aqar_user_favorites", JSON.stringify(favoritesList));
 };
 
-var clearUserLocalStorage = function () {
+let clearUserLocalStorage = function () {
     if (typeof Storage !== "undefined") {
         localStorage.removeItem("aqar_user");
 
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
         clearUserLocalStorage();
     }
 
-    var logoutLink = document.querySelector('a[href="/logout"]');
+    let logoutLink = document.querySelector('a[href="/logout"]');
     if (logoutLink) {
         logoutLink.addEventListener("click", function () {
             clearUserLocalStorage();
@@ -127,28 +127,28 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-var toggleFav = async function (btn, propId) {
+let toggleFav = async function (btn, propId) {
 
     try {
-        var response = await fetch("/api/favorite/" + propId, { method: "POST" });
+        let response = await fetch("/api/favorite/" + propId, { method: "POST" });
 
         if (response.redirected) {
             showToast("Please login to save properties");
             return;
         }
 
-        if (!response.ok) {
-            throw new Error("Server error");
+        if (response.ok === false) {
+            throw new Error("Server error: " + response.status);
         }
 
-        var data = await response.json();
+        let data = await response.json();
 
-        var all_buttons = document.querySelectorAll("[data-prop-id=\"" + propId + "\"]");
+        let all_buttons = document.querySelectorAll("[data-prop-id=\"" + propId + "\"]");
 
-        for (var i = 0; i < all_buttons.length; i++) {
-            var button = all_buttons[i];
+        for (let i = 0; i < all_buttons.length; i++) {
+            let button = all_buttons[i];
 
-            if (data.favorited) {
+            if (data.favorited === true) {
                 button.classList.add("active");
                 button.textContent = "❤️";
             } else {
@@ -157,10 +157,10 @@ var toggleFav = async function (btn, propId) {
             }
         }
 
-        var detail_button = document.getElementById("detailFavBtn");
+        let detail_button = document.getElementById("detailFavBtn");
 
         if (detail_button) {
-            if (data.favorited) {
+            if (data.favorited === true) {
                 detail_button.classList.add("active");
                 detail_button.innerHTML = "❤️ Saved";
             } else {
@@ -171,7 +171,7 @@ var toggleFav = async function (btn, propId) {
 
         updateLocalStorageFavorites(propId, data.favorited);
 
-        if (data.favorited) {
+        if (data.favorited === true) {
             showToast("Property saved ❤️");
         } else {
             showToast("Removed from saved");
@@ -179,19 +179,20 @@ var toggleFav = async function (btn, propId) {
 
     } catch (error) {
         showToast("Something went wrong. Please try again.");
+        console.error("Error toggling favorite:", error);
     }
 
 };
 
 
-var showToast = function (message) {
+let showToast = function (message) {
 
-    var existing_toast = document.getElementById("toastMsg");
+    let existing_toast = document.getElementById("toastMsg");
     if (existing_toast) {
         existing_toast.remove();
     }
 
-    var toast = document.createElement("div");
+    let toast = document.createElement("div");
     toast.id = "toastMsg";
     toast.className = "toast";
     toast.textContent = message;

@@ -1,0 +1,20 @@
+<!--Buy Now success page-->
+{% extends "base.html" %}
+{% block content %}
+
+<section class="thankyou_section">
+    <div class="thankyou_card">
+        <div class="thankyou_icon">🎉</div>
+        <h1 class="thankyou_title">Thank You!</h1>
+        <p class="thankyou_msg">
+            Thank you! The owner will contact you within 24 hours!
+        </p>
+        <p class="thankyou_prop">
+            Your enquiry for <strong>{{ property.title }}</strong> in {{ property.area }}
+            has been received successfully.
+        </p>
+        <a class="thankyou_home_btn" href="/">Back to Homepage</a>
+    </div>
+</section>
+
+{% endblock %}

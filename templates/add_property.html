@@ -1,71 +1,98 @@
-<!--adding new property from the user-->
+<!--Add listing form with image upload-->
 {% extends "base.html" %}
 {% block content %}
 
-<section class="section">
-    <div class="form_page">
-        <h1 class="form_page_title">List a New Property</h1>
-        <p class="form_page_sub">Fill in the details below to add your listing</p>
+<div class="form_page">
+    <h1 class="form_page_title">List a New Property</h1>
+    <p class="form_page_sub">Fill in all details to create your listing. Fields marked * are required.</p>
 
-        <!-- Error message-->
-        <!--validation still needed-->
-        {% if error %}
-        <div class="alert_error">⚠️ {{ error }}</div>
-        {% endif %}
+    {% if error %}
+    <div class="alert alert_error">⚠️ {{ error }}</div>
+    {% endif %}
+    {% if success %}
+    <div class="alert alert_success">✅ {{ success }}</div>
+    {% endif %}
 
-        {% if success %}
-        <div class="alert_success">✅ {{ success }}</div>
-        {% endif %}
+    <!-- enctype="multipart/form-data" is required for file upload -->
+    <form class="property_form" action="/add-property" method="POST" enctype="multipart/form-data">
 
-        <!-- Text input sent to Python backend-->
-        <form class="property_form" action="/add-property" method="POST">
+        <!-- Title -->
+        <div class="property_form_group">
+            <label class="property_form_label" for="title">Property Title *</label>
+            <input class="property_form_input" id="title" type="text" name="title"
+                   placeholder="e.g. Modern Apartment in New Cairo" required>
+        </div>
 
+        <!-- Area + Type -->
+        <div class="property_form_row">
             <div class="property_form_group">
-                <label class="property_form_label" for="title">Property Title</label>
-                <input class="property_form_input" id="title" type="text" name="title"
-                       placeholder="e.g. Modern Apartment in New Cairo" required>
+                <label class="property_form_label" for="area">Area *</label>
+                <input class="property_form_input" id="area" type="text" name="area"
+                       placeholder="e.g. Maadi" required>
             </div>
-
-            <div class="property_form_row">
-                <div class="property_form_group">
-                    <label class="property_form_label" for="area">Area</label>
-                    <input class="property_form_input" id="area" type="text" name="area"
-                           placeholder="e.g. Maadi" required>
-                </div>
-                <div class="property_form_group">
-                    <label class="property_form_label" for="prop_type">Type</label>
-                    <select class="property_form_input" id="prop_type" name="prop_type" required>
-                        <option value="">Select type</option>
-                        <option value="Apartment">Apartment</option>
-                        <option value="Villa">Villa</option>
-                        <option value="Townhouse">Townhouse</option>
-                        <option value="Penthouse">Penthouse</option>
-                        <option value="Studio">Studio</option>
-                    </select>
-                </div>
+            <div class="property_form_group">
+                <label class="property_form_label" for="prop_type">Type *</label>
+                <select class="property_form_input" id="prop_type" name="prop_type" required>
+                    <option value="">Select type</option>
+                    <option value="Apartment">Apartment</option>
+                    <option value="Villa">Villa</option>
+                    <option value="Townhouse">Townhouse</option>
+                    <option value="Penthouse">Penthouse</option>
+                    <option value="Studio">Studio</option>
+                </select>
             </div>
+        </div>
 
-            <div class="property_form_row">
-                <div class="property_form_group">
-                    <label class="property_form_label" for="price">Price (EGP)</label>
-                    <input class="property_form_input" id="price" type="number" name="price"
-                           placeholder="e.g. 3500000" min="0" required>
-                </div>
-                <div class="property_form_group">
-                    <label class="property_form_label" for="bedrooms">Bedrooms</label>
-                    <input class="property_form_input" id="bedrooms" type="number" name="bedrooms"
-                           placeholder="e.g. 3" min="0" required>
-                </div>
-                <div class="property_form_group">
-                    <label class="property_form_label" for="bathrooms">Bathrooms</label>
-                    <input class="property_form_input" id="bathrooms" type="number" name="bathrooms"
-                           placeholder="e.g. 2" min="0" required>
-                </div>
+        <!-- Price + Beds + Baths -->
+        <div class="property_form_row">
+            <div class="property_form_group">
+                <label class="property_form_label" for="price">Price (EGP) *</label>
+                <input class="property_form_input" id="price" type="number" name="price"
+                       placeholder="e.g. 3500000" min="0" required>
             </div>
+            <div class="property_form_group">
+                <label class="property_form_label" for="bedrooms">Bedrooms *</label>
+                <input class="property_form_input" id="bedrooms" type="number" name="bedrooms"
+                       placeholder="e.g. 3" min="0" required>
+            </div>
+            <div class="property_form_group">
+                <label class="property_form_label" for="bathrooms">Bathrooms *</label>
+                <input class="property_form_input" id="bathrooms" type="number" name="bathrooms"
+                       placeholder="e.g. 2" min="0" required>
+            </div>
+        </div>
 
-            <button class="property_form_btn" type="submit">Add Listing</button>
-        </form>
-    </div>
-</section>
+        <!-- Image Upload -->
+        <div class="property_form_group">
+            <label class="property_form_label" for="image">Property Image</label>
+            <input class="property_form_input" id="image" type="file" name="image"
+                   accept="image/png, image/jpeg, image/webp"
+                   style="height: auto; padding: 10px 14px;">
+            <small style="color: var(--text-light); margin-top: 4px;">
+                Accepted: JPG, PNG, WEBP. If no image is uploaded a default photo is used.
+            </small>
+        </div>
+
+        <!-- Long Description -->
+        <div class="property_form_group">
+            <label class="property_form_label" for="description">Property Description</label>
+            <textarea class="property_form_input property_form_textarea"
+                      id="description" name="description"
+                      placeholder="Describe the property in detail — layout, finishes, building amenities..."></textarea>
+        </div>
+
+        <!-- Why Choose This -->
+        <div class="property_form_group">
+            <label class="property_form_label" for="why_choose">Why Choose This Property</label>
+            <textarea class="property_form_input property_form_textarea"
+                      id="why_choose" name="why_choose"
+                      placeholder="What makes this property special? Location benefits, investment potential, unique features..."></textarea>
+        </div>
+
+
+        <button class="property_form_btn" type="submit">Add Listing</button>
+
+    </form>
+</div>
 
 {% endblock %}

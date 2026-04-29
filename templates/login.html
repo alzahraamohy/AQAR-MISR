@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="auth_page">
+    <div class="auth_card">
+        <h1 class="auth_title">Welcome Back</h1>
+        <p class="auth_sub">Don't have an account? <a href="/signup">Sign up free</a></p>
+
+        {% if error %}
+        <div class="alert alert_error">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <form action="/login" method="POST">
+            <div class="property_form_group">
+                <label class="property_form_label" for="email">Email Address</label>
+                <input class="property_form_input" id="email" type="email" name="email"
+                       placeholder="you@example.com" required>
+            </div>
+            <div class="property_form_group">
+                <label class="property_form_label" for="password">Password</label>
+                <input class="property_form_input" id="password" type="password" name="password"
+                       placeholder="Your password" required>
+            </div>
+            <button class="auth_btn" type="submit">Login</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

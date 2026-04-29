@@ -1,56 +1,81 @@
-<!--Single property detail-->
+<!--map, specs, description, Buy Now-->
 {% extends "base.html" %}
 {% block content %}
 
 <section class="detail">
     <div class="section_container">
 
-        <!-- Back to full lists link -->
-        <a class="detail__back" href="/search">← Back to results</a>
+        <!-- back line -->
+        <a class="detail_back" href="/search">&larr; Back to results</a>
 
-        <!-- Hero image -->
-        <div class="detail__image-wrap">
-            <img class="detail__image" src="{{ property.image_url }}" alt="{{ property.title }}">
-            <span class="card__badge">{{ property.prop_type }}</span>
+        <!-- image + map-->
+        <div class="detail_media_row"
+             id="propertyData"
+             data-title="{{ property.title }}">
+            <div class="image_wrap">
+                <img class="main_img" src="{{ property.image_url }}" alt="{{ property.title }}" loading="lazy">
+            </div>
         </div>
 
+        <!-- details -->
         <div class="detail_layout">
 
-            <!-- Main info -->
-            <div class="detail_main">
+            <!--full property information -->
+            <div>
                 <h1 class="detail_title">{{ property.title }}</h1>
                 <p class="detail_area">{{ property.area }}</p>
                 <p class="detail_price">EGP {{ "{:,}".format(property.price) }}</p>
 
+                <!-- Spec boxes: beds / baths / type -->
                 <div class="detail_specs">
-                    <div class="spec-box">
-                        <span class="spec_box_icon"></span>
+                    <div class="spec_box">
                         <span class="spec_box_value">{{ property.bedrooms }}</span>
                         <span class="spec_box_label">Bedrooms</span>
                     </div>
-                    <div class="spec-box">
-                        <span class="spec_box_icon"></span>
+                    <div class="spec_box">
                         <span class="spec_box_value">{{ property.bathrooms }}</span>
                         <span class="spec_box_label">Bathrooms</span>
                     </div>
                     <div class="spec_box">
-                        <span class="spec_box_icon"></span>
                         <span class="spec_box_value">{{ property.prop_type }}</span>
                         <span class="spec_box_label">Type</span>
                     </div>
                 </div>
 
+                <!-- Short summary from the Property.get_summary() method -->
                 <p class="detail_summary">{{ property.get_summary() }}</p>
-                <p class="detail_listed">Listed on: {{ property.listed_at[:10] }}</p>
-            </div>
 
-            <!-- Contact card -->
-            <div class="detail_sidebar">
-                <div class="contact-card">
-                    <h3 class="contact-card__title">Interested in this property?</h3>
-                    <p class="contact-card__sub">Contact the agent for more details</p>
-                    <a class="contact-card__btn" href="/add-property">List Similar Property</a>
+                <!-- Long description -->
+                {% if property.description %}
+                <p class="detail_description">{{ property.description }}</p>
+                {% endif %}
+
+                <!-- Why Choose This Property section -->
+                {% if property.why_choose %}
+                <div class="why_choose_box">
+                    <h3 class="why_choose_title">Why Choose This Property</h3>
+                    <p class="why_choose_text">{{ property.why_choose }}</p>
                 </div>
+                {% endif %}            
+
+                <!-- BUY NOW button -->
+                {% if user %}
+                <div style="margin-top: 16px;">
+                    <a class="buy_now_btn" href="/buy/{{ property.prop_id }}">
+                        Buy Now
+                    </a>
+                </div>
+                {% else %}
+                <div style="margin-top: 16px;">
+                    <a class="buy_now_btn" href="/login" style="background: var(--gray);">
+                        Login to Buy
+                    </a>
+                </div>
+                {% endif %}
+
+                <p class="detail_listed" style="margin-top: 20px;">
+                    Listed on: {{ property.listed_at[:10] }}
+                </p>
             </div>
 
         </div>

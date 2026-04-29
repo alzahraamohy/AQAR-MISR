@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="filter_section">
+    <div class="section_container">
+
+        <!-- Page header -->
+        <div class="section_header" style="margin-bottom: 28px;">
+            <h1 class="section_title">&#10084;&#65039; Saved Properties</h1>
+            {% if user %}
+            <span style="color: var(--text-light); font-size: 0.9rem;">
+                {{ favorites|length }} saved
+            </span>
+            {% endif %}
+        </div>
+
+        {% if not user %}
+        <!-- Not logged in -->
+        <div class="empty_state">
+            <p class="empty_state_text" style="font-size: 1.2rem; margin-bottom: 8px;">
+                Please log in to see your saved properties.
+            </p>
+            <p style="color: var(--text-light); margin-bottom: 24px; font-size: 0.9rem;">
+                Create a free account to start saving properties and revisit them anytime.
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="/login"
+                   style="display: inline-block; padding: 12px 32px; background: var(--blue);
+                          color: var(--white); border-radius: var(--radius-sm);
+                          font-weight: 600; transition: background 0.2s;">
+                    Login
+                </a>
+                <a href="/signup"
+                   style="display: inline-block; padding: 12px 32px; background: var(--gold);
+                          color: var(--white); border-radius: var(--radius-sm);
+                          font-weight: 600; transition: background 0.2s;">
+                    Sign Up Free
+                </a>
+            </div>
+        </div>
+
+        {% elif favorites|length == 0 %}
+        <!-- Logged in but no favorites yet -->
+        <div class="empty_state">
+            <p class="empty_state_text" style="font-size: 1.2rem; margin-bottom: 8px;">
+                You have not saved any properties yet.
+            </p>
+            <p style="color: var(--text-light); margin-bottom: 24px; font-size: 0.9rem;">
+                Click the heart button on any property card to save it here.
+            </p>
+            <a class="empty_state_link" href="/search">Browse all properties &rarr;</a>
+        </div>
+
+        {% else %}
+        <!-- Favorites grid -->
+        <div class="cards_grid" id="favsGrid">
+            {% for prop in favorites %}
+            <a class="card" href="/property/{{ prop.prop_id }}">
+                <div class="card_image_wrap">
+                    <img
+                        class="card_image"
+                        src="{{ prop.image_url }}"
+                        alt="{{ prop.title }}"
+                        loading="lazy"
+                    >
+                    <span class="card_badge">{{ prop.prop_type }}</span>
+
+                    <button
+                        class="fav_btn active"
+                        data-prop-id="{{ prop.prop_id }}"
+                        title="Remove from favorites"
+                    >&#10084;&#65039;</button>
+                </div>
+                <div class="card_body">
+                    <h3 class="card_title">{{ prop.title }}</h3>
+                    <p class="card_area">{{ prop.area }}</p>
+                    <div class="card_meta">
+                        <span>{{ prop.bedrooms }} beds</span>
+                        <span>{{ prop.bathrooms }} baths</span>
+                    </div>
+                    <p class="card_price">EGP {{ "{:,}".format(prop.price) }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% endif %}
+
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var favoritesGrid = document.getElementById("favsGrid");
+        if (favoritesGrid !== null) {
+            var buttons = favoritesGrid.querySelectorAll(".fav_btn");
+            
+            for (var i = 0; i < buttons.length; i++) {
+                var btn = buttons[i];
+                btn.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    var propId = parseInt(this.getAttribute("data-prop-id"), 10);
+                    toggleFav(this, propId);
+                });
+            }
+        }
+    });
+</script>
+
+{% endblock %}

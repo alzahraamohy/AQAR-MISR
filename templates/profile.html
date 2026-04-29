@@ -1,0 +1,77 @@
+<!--User info + saved properties-->
+{% extends "base.html" %}
+{% block content %}
+
+<section class="profile_section">
+    <div class="section_container">
+
+        <!-- User header -->
+        <div class="profile_header">
+            <div class="profile_avatar">{{ user.name[0].upper() }}</div>
+            <div>
+                <h1 class="profile_name">{{ user.name }}</h1>
+                <p class="profile_email">{{ user.email }}</p>
+                <p class="profile_joined">Member since {{ user.joined_at[:10] }}</p>
+            </div>
+        </div>
+
+        <!-- Saved properties -->
+        <h2 class="profile_fav_title">&#10084;&#65039; Saved Properties ({{ favorites|length }})</h2>
+
+        {% if favorites %}
+        <div class="cards_grid" id="profileGrid">
+            {% for prop in favorites %}
+            <a class="card" href="/property/{{ prop.prop_id }}">
+                <div class="card_image_wrap">
+                    <img
+                        class="card_image"
+                        src="{{ prop.image_url }}"
+                        alt="{{ prop.title }}"
+                        loading="lazy"
+                    >
+                    <span class="card_badge">{{ prop.prop_type }}</span>
+                    <button
+                        class="fav_btn active"
+                        data-prop-id="{{ prop.prop_id }}"
+                        title="Remove from favorites"
+                    >&#10084;&#65039;</button>
+                </div>
+                <div class="card_body">
+                    <h3 class="card_title">{{ prop.title }}</h3>
+                    <p class="card_area">{{ prop.area }}</p>
+                    <div class="card_meta">
+                        <span>{{ prop.bedrooms }} beds</span>
+                        <span>{{ prop.bathrooms }} baths</span>
+                    </div>
+                    <p class="card_price">EGP {{ "{:,}".format(prop.price) }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% else %}
+        <div class="empty_state">
+            <p class="empty_state_text">You haven't saved any properties yet.</p>
+            <a class="empty_state_link" href="/search">Browse properties</a>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var grid = document.getElementById("profileGrid");
+        if (!grid) return;
+
+        grid.querySelectorAll(".fav_btn").forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+                e.preventDefault();
+                var pid = parseInt(btn.getAttribute("data-prop-id"), 10);
+                toggleFav(btn, pid);
+            });
+        });
+    });
+</script>
+
+{% endblock %}

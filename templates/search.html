@@ -1,19 +1,21 @@
-<!--search page-->
 {% extends "base.html" %}
 {% block content %}
 
-<section class="section_search">
+<section class="filter_section">
     <div class="section_container">
 
         <!-- Filter bar -->
         <form class="filter_bar" action="/search" method="GET">
-            <input
-                class="filter_bar_input"
-                type="text"
-                name="area"
-                value="{{ selected_area }}"
-                placeholder="Area"
-            >
+
+            <select class="filter_bar_input" id="areaInput" name="area">
+                <option value="">Any Area</option>
+                <option value="New Cairo" {% if selected_area == "New Cairo" %}selected{% endif %}>New Cairo</option>
+                <option value="Sheikh Zayed" {% if selected_area == "Sheikh Zayed" %}selected{% endif %}>Sheikh Zayed</option>
+                <option value="Maadi" {% if selected_area == "Maadi" %}selected{% endif %}>Maadi</option>
+                <option value="New Capital" {% if selected_area == "New Capital" %}selected{% endif %}>New Capital</option>
+                <option value="6th of October" {% if selected_area == "6th of October" %}selected{% endif %}>6th of October</option>
+            </select>
+
             <select class="filter_bar_input" name="type">
                 <option value="">Any Type</option>
                 <option value="Apartment" {% if selected_type == "Apartment" %}selected{% endif %}>Apartment</option>
@@ -22,50 +24,99 @@
                 <option value="Penthouse" {% if selected_type == "Penthouse" %}selected{% endif %}>Penthouse</option>
                 <option value="Studio" {% if selected_type == "Studio" %}selected{% endif %}>Studio</option>
             </select>
-            <input
-                class="filter_bar_input"
-                type="number"
-                name="max_price"
-                value="{{ selected_price }}"
-                placeholder="Max Price (EGP)"
-                min="0"
-            >
+
+            <input class="filter_bar_input" type="number" name="max_price"
+                   value="{{ selected_price if selected_price else 30000000 }}" placeholder="Max Price (EGP)" min="3000000" max="30000000" step="500000">
+
             <button class="filter_bar_btn" type="submit">Filter</button>
             <a class="filter_bar_clear" href="/search">Clear</a>
+
         </form>
 
         <!-- Results count -->
         <p class="results_count">
-            <strong>{{ properties|length }}</strong> propert{{ "y" if properties|length == 1 else "ies" }} found
+            <strong>{{ properties|length }}</strong>
+            {% if properties|length == 1 %}
+                property found
+            {% else %}
+                properties found
+            {% endif %}
         </p>
 
-        <!-- Property Cards Grid -->
+        <!-- Cards grid -->
         <div class="cards_grid">
-            {% for prop in properties %}
-            <a class="card" href="/property/{{ prop.prop_id }}">
-                <div class="card_image_wrap">
-                    <img class="card_image" src="{{ prop.image_url }}" alt="{{ prop.title }}">
-                    <span class="card_badge">{{ prop.prop_type }}</span>
-                </div>
-                <div class="card_body">
-                    <h3 class="card_title">{{ prop.title }}</h3>
-                    <p class="card_area"> {{ prop.area }}</p>
-                    <div class="card_meta">
-                        <span>{{ prop.bedrooms }} beds</span>
-                        <span>{{ prop.bathrooms }} baths</span>
-                    </div>
-                    <p class="card_price">EGP {{ "{:,}".format(prop.price) }}</p>
-                </div>
-            </a>
+
+            {% if user %}
+                {% set user_is_logged_in = true %}
+                {% set user_favorite_ids = user.favorites %}
             {% else %}
-            <div class="empty_state">
-                <p class="empty_state_text">No properties match your filters.</p>
-                <a class="empty_state_link" href="/search">Clear filters</a>
-            </div>
+                {% set user_is_logged_in = false %}
+                {% set user_favorite_ids = [] %}
+            {% endif %}
+
+            {% for prop in properties %}
+
+                <a class="card" href="/property/{{ prop.prop_id }}">
+
+                    <div class="card_image_wrap">
+                        <img class="card_image" src="{{ prop.image_url }}"
+                             alt="{{ prop.title }}" loading="lazy">
+                        <span class="card_badge">{{ prop.prop_type }}</span>
+
+                        {% if user_is_logged_in %}
+                            {% if prop.prop_id in user_favorite_ids %}
+                                <button class="fav_btn active" data-prop-id="{{ prop.prop_id }}"
+                                        title="Remove from favorites">&#10084;&#65039;</button>
+                            {% else %}
+                                <button class="fav_btn" data-prop-id="{{ prop.prop_id }}"
+                                        title="Save to favorites">&#129293;</button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <div class="card_body">
+                        <h3 class="card_title">{{ prop.title }}</h3>
+                        <p class="card_area">{{ prop.area }}</p>
+                        <div class="card_meta">
+                            <span>{{ prop.bedrooms }} beds</span>
+                            <span>{{ prop.bathrooms }} baths</span>
+                        </div>
+                        <p class="card_price">EGP {{ "{:,}".format(prop.price) }}</p>
+                    </div>
+
+                </a>
+
+            {% else %}
+                <div class="empty_state">
+                    <p class="empty_state_text">No properties match your filters.</p>
+                    <a class="empty_state_link" href="/search">Clear all filters</a>
+                </div>
             {% endfor %}
+
         </div>
 
     </div>
 </section>
+
+{% if user %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        var all_heart_buttons = document.querySelectorAll(".fav_btn");
+
+        for (var i = 0; i < all_heart_buttons.length; i++) {
+            var button = all_heart_buttons[i];
+
+            button.addEventListener("click", function (event) {
+                event.preventDefault();
+                var property_id_string = this.getAttribute("data-prop-id");
+                var property_id_number = parseInt(property_id_string, 10);
+                toggleFav(this, property_id_number);
+            });
+        }
+
+    });
+</script>
+{% endif %}
 
 {% endblock %}

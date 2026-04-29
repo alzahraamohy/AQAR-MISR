@@ -1,40 +1,62 @@
-<!--header and footer-->
+<!--navbar, footer, links -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQAR MISR </title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>AQAR MISR</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS for map on property detail page -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='photos/amLogo.png') }}">
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="navbar_container">
-            <a href="/" class="navbar_logo">
-            <img src="{{ url_for('static', filename='photos/logo.png') }}" alt="AQAR MISR" class="logo_img">
+<!--navbar-->
+<nav class="navbar">
+    <div class="navbar_container">
+
+        <a href="/" class="navbar_logo">
+            <img src="{{ url_for('static', filename='photos/amLogo.png') }}" alt="AQAR MISR Logo" class="navbar_logo_img">
+            <span>AQAR MISR</span>
         </a>
-            <ul class="navbar_links">
-                <li><a href="/add-property">List Property</a></li> 
-            </ul>
-        </div>
-    </nav>
 
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+        <ul class="navbar_links">
+            <!-- "List Property" always visible -->
+            <li><a href="/add-property" class="add_prop">Sell your Property here</a></li>
 
-    <footer class="footer">
-    <div class="footer_brand">
-        <img src="{{ url_for('static', filename='photos/logo.png') }}" 
-             alt="AQAR MISR - عقار مصر" 
-             class="logo_img">
-        <p class="footer_rights">© All rights reserved.</p>
+            {% if user %}
+                <!-- Shown only when logged in -->
+                <li><a href="/favorites">&#10084;&#65039; Saved</a></li>
+                <li><a href="/profile">&#128100; {{ user.get_display_name() }}</a></li>
+                <li><a href="/logout">Logout</a></li>
+            {% else %}
+                <!-- Shown only when logged out -->
+                <li><a href="/login"  class="auth_link">Login</a></li>
+                <li><a href="/signup" class="auth_link">Sign Up</a></li>
+            {% endif %}
+        </ul>
+
     </div>
-</footer>
+</nav>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+window.AQAR_USER = {% if user %}{
+    user_id: {{ user.user_id }},
+    name: {{ user.name|tojson }},
+    email: {{ user.email|tojson }},
+    favorites: {{ user.favorites|tojson }}
+}{% else %}null{% endif %};
+</script>
+
+<!--content -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!--FOOTER-->
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 </body>
 </html>

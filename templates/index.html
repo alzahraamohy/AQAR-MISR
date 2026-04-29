@@ -1,25 +1,24 @@
-<!--landing page-->
+<!--hero and featured cards-->
 {% extends "base.html" %}
 {% block content %}
 
-<!--Hero section-->
-<section class = "hero">
-    <div class = "hero_overlay"></div>
-    <div class = "hero_content">
-        <h1 class = "hero_title">Find Your Dream Home in Egypt</h1>
-        <p class="hero_subtitle">Thousands of properties across New Cairo, Sheikh Zayed, Maadi and beyond</p>
-
-        <!--Search bar-->
+<!-- ── HERO ──────────────────────────────────────────────────────────── -->
+<section class="hero">
+    <div class="hero_content">
+        <h1 class="hero_title">Find Your Dream Home in Egypt</h1>
+        <p class="hero_subtitle">
+            Thousands of properties across New Cairo, Sheikh Zayed, Maadi and beyond
+        </p>
         <form class="hero_form" action="/search" method="GET">
-            <div class="hero_inputs"> <!--MAKE IT DROPDOWN -->
-                <input
-                    class="hero_input"
-                    type="text"
-                    name="area"
-                    placeholder="Area (e.g. New Cairo)"
-                    autocomplete="off"
-                > <!--capitilization should be fixed LATER -->
-
+            <div class="hero_inputs">
+                <select class="hero_input" name="area">
+                    <option value="">Any Area</option>
+                    <option value="New Cairo">New Cairo</option>
+                    <option value="Sheikh Zayed">Sheikh Zayed</option>
+                    <option value="Maadi">Maadi</option>
+                    <option value="New Capital">New Capital</option>
+                    <option value="6th of October">6th of October</option>
+                </select>
                 <select class="hero_input" name="type">
                     <option value="">Any Type</option>
                     <option value="Apartment">Apartment</option>
@@ -28,40 +27,46 @@
                     <option value="Penthouse">Penthouse</option>
                     <option value="Studio">Studio</option>
                 </select>
-                <input
-                    class="hero_input"
-                    type="number"
-                    name="max_price"
-                    placeholder="Max Price (EGP)"
-                    min="0"
-                >
-                </div>
+                <input class="hero_input" type="number" name="max_price" 
+                       placeholder="Max Price (EGP)" min="3000000" max="30000000" step="500000">
+            </div>
             <button class="hero_btn" type="submit">Search Properties</button>
         </form>
     </div>
 </section>
 
-<!--Features section-->
-<section class = "features">
-     <div class="section_container">
+<!-- ── FEATURED PROPERTIES (exactly 6 cards) ─────────────────────────── -->
+<section class="featured_section">
+    <div class="section_container">
         <div class="section_header">
             <h2 class="section_title">Featured Properties</h2>
-            <a class="section_link" href="/search">View all →</a>
+            <a class="section_link" href="/search">View all &rarr;</a>
         </div>
 
         <div class="cards_grid">
             {% for prop in properties %}
             <a class="card" href="/property/{{ prop.prop_id }}">
-                <div class="card_image-wrap">
-                    <img class="card_image" src="{{ prop.image_url }}" alt="{{ prop.title }}">
+                <div class="card_image_wrap">
+                    <img class="card_image" src="{{ prop.image_url }}" alt="{{ prop.title }}" loading="lazy">
                     <span class="card_badge">{{ prop.prop_type }}</span>
+
+                    <!-- Favorite heart button — requires login -->
+                    {% if user %}
+                    <button
+                        class="fav_btn {% if prop.prop_id in user.favorites %}active{% endif %}"
+                        data-prop-id="{{ prop.prop_id }}"
+                        title="Save to favorites"
+                    >
+                        {% if prop.prop_id in user.favorites %}&#10084;&#65039;{% else %}&#129293;{% endif %}
+                    </button>
+                    {% endif %}
                 </div>
                 <div class="card_body">
                     <h3 class="card_title">{{ prop.title }}</h3>
                     <p class="card_area">{{ prop.area }}</p>
                     <div class="card_meta">
-                        <span>{{ prop.bedrooms }} bed</span>
-                        <span>{{ prop.bathrooms }} bath</span>
+                        <span>{{ prop.bedrooms }} beds</span>
+                        <span>{{ prop.bathrooms }} baths</span>
                     </div>
                     <p class="card_price">EGP {{ "{:,}".format(prop.price) }}</p>
                 </div>
@@ -70,5 +75,24 @@
         </div>
     </div>
 </section>
+
+{% if user %}
+<script>
+    // Wire up all heart buttons on the homepage after the page loads.
+    document.addEventListener("DOMContentLoaded", function() {
+        var favoriteButtons = document.querySelectorAll(".fav_btn");
+        
+        for (var i = 0; i < favoriteButtons.length; i++) {
+            var currentBtn = favoriteButtons[i];
+            currentBtn.addEventListener("click", function(event) {
+                event.preventDefault();
+                // Get the ID from the button's data attribute
+                var propertyId = parseInt(this.getAttribute("data-prop-id"), 10);
+                toggleFav(this, propertyId);
+            });
+        }
+    });
+</script>
+{% endif %}
 
 {% endblock %}
